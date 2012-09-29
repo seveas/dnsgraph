@@ -1,0 +1,19 @@
+{% extends "ip_info/base.html" %}
+{% block github_repo %}dnsgraph{% endblock %}
+{% block content %}
+  {% if error %}<h2 class="error">{{ error }}</h2>{% endif %}
+  <form action="." method="POST">
+  {{ form.non_field_errors }}<br />
+  {{ form.name.errors }}
+  {{ form.name }}<br />
+  {{ form.qtype.errors }}
+  {{ form.qtype }}<br />
+  {% csrf_token %}
+  <input id="submit" type="submit" value="Trace">
+  </form>
+  {% if jobs %}
+  <p>
+  There are currently {{ jobs }} traces in the queue, please be patient.
+  </p>
+  {% endif %}
+{% endblock %}

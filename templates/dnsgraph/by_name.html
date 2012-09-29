@@ -1,0 +1,15 @@
+{% extends "ip_info/base.html" %}
+{% block github_repo %}dnsgraph{% endblock %}
+{% block content %}
+  <form action="../png/{{ queries.0.name }}/" method="GET">
+  {% for query in queries %}
+    {{ query.name }} ({{ query.qtype }}) is {% if query.available %}available <input type="submit" name="show_{{ query.qtype }}" value="Show" />{% else %}being traced{% endif %}<br />
+  {% endfor %}
+  <p class="opts">
+  Skip nameservers for <br />
+  {% for zone in zones %}
+  <input type="checkbox" name="skip_{{ zone }}" id="skip_{{ zone }}" /><label for="id_{{ zone }}">{{ zone }}</label><br />
+  {% endfor %}
+  </p>
+  </form>
+{% endblock %}

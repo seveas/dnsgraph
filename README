@@ -1,0 +1,58 @@
+tracegraph
+==========
+
+Usage: tracegraph.py [options] name - Trace all resolution paths for a name and graph them
+
+Examples:
+tracegraph.py -t MX --graph png --output booking.png --skip . --skip com. booking.com
+tracegraph.py --skip . kaarsemaker.net --dump=kaarsemaker.yaml
+tracegraph.py --load broken_example.yaml --errors-only --graph png --output example.png
+
+Options:
+  -h, --help            show this help message and exit
+  -q, --quiet           No diagnostic messages
+  -t RDTYPE, --type=RDTYPE
+                        Which record type to query
+  -d FILE, --dump=FILE  Dump resolver data to a file
+  -l FILE, --load=FILE  Load resolver data from a file
+  -f FORMAT, --format=FORMAT
+                        Dump/load format
+  -g FORMAT, --graph=FORMAT
+                        Graph format, see dot(1)
+  -D, --display         Display the result using GraphicsMagick's display(1)
+  -o FILE, --output=FILE
+                        Filename for the graph
+  -s SKIP, --skip=SKIP  Zone to skip in the graph (may be repeated)
+  -e, --errors-only     Only show error nodes and vertices
+  -n, --nagios          Function as a nagios plug-in
+  -T, --trace-missing-glue
+                        Perform full traces for nameserver for which we did
+                        not receive glue records
+  --even-trace-m-gtld-servers-net
+                        m.gtld-servers.net is special, it's specialness is
+                        ignored unless this option is given
+
+Requirements
+------------
+- dnspython (dnspython.org)
+- whelk (seveas.github.com/whelk)
+- graphviz (graphviz.org)
+
+For the django app only:
+- beanstalkd and beanstalkc (kr.github.com/beanstalkd)
+- django (djangoproject.com)
+
+Django app
+----------
+
+This is also a django app. To use the django app, make sure this directory and
+tracegraph.py are available on your sys.path. Then add 'dnsgraph' to your
+INSTALLED_APPS setting and urls.py and run syncdb.
+
+You'll need to run beanstalkd and add its info to your settings.py too:
+
+BEANSTALK_SERVER = {'host': '127.0.0.1', 'port': 11300}
+
+Then run the 'daemon' that does the actual checks in a screen session:
+
+./manage.py dnsgraph_daemon
