@@ -300,6 +300,18 @@ class Resolver(object):
         zone = None
         for record in ans.response.authority:
             zonename = record.name.to_text()
+            if zonename in self.root.subzones and zonename != self.zone.name and self.zone.name.endswith(zonename):
+                # They're trying to send us back up, nasty!
+                # Let's cut that off right now
+                if register:
+                    msg = 'NXDOMAIN'
+                    if name not in self.root.names:
+                        self.root.names[name] = Name(name)
+                    name = self.root.names[name]
+                    if msg not in name.addresses:
+                        name.addresses[msg] = []
+                    name.addresses[msg].append(self)
+                return
             if record.rdtype == dns.rdatatype.NS:
                 if not register:
                     zone = Zone(zonename, self.root)
