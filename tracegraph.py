@@ -282,7 +282,7 @@ class Resolver(object):
                 # Insert a bogus name node for NXDOMAIN/SERVFAIL
                 msg = dns_errors[sys.exc_type]
                 if not register:
-                    raise
+                    return
                 if name not in self.root.names:
                     self.root.names[name] = Name(name)
                 name = self.root.names[name]
@@ -346,7 +346,7 @@ class Resolver(object):
         # Real answer
         names = {}
         resolve = []
-        orig_name = name
+        orig_name = name.lower()
 
         for record in ans.response.answer:
             name = record.name.to_text().lower()
