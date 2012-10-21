@@ -56,13 +56,23 @@ def by_name(request, name):
     if not len(queries):
         raise Http404
     zones = set('.')
+    has_results = False
+    is_waiting = False
     for query in queries:
         if query.available:
             with open(query.data_path) as fd:
                 data = yaml.load(fd)
                 zones = zones.union(set([x['name'] for x in data['zones']]))
+            has_results = True
+        else:
+            is_waiting = True
 
-    return render_to_response('dnsgraph/by_name.html', {'queries': queries, 'zones': sorted(list(zones))})
+    return render_to_response('dnsgraph/by_name.html', context_instance=RequestContext(request, {
+        'queries': queries,
+        'zones': sorted(list(zones)),
+        'has_results': has_results,
+        'is_waiting': is_waiting,
+    }))
 
 def as_png(request, name):
     qtype = 'A'

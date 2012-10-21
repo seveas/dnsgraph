@@ -2,14 +2,21 @@
 {% block github_repo %}dnsgraph{% endblock %}
 {% block content %}
   <form action="../png/{{ queries.0.name }}/" method="GET">
-  {% for query in queries %}
-    {{ query.name }} ({{ query.qtype }}) is {% if query.available %}available <input type="submit" name="show_{{ query.qtype }}" value="Show" />{% else %}being traced{% endif %}<br />
-  {% endfor %}
+  {% if has_results %}
   <p class="opts">
-  Skip nameservers for <br />
+  In the graphs, skip nameservers for <br />
   {% for zone in zones %}
-  <input type="checkbox" name="skip_{{ zone }}" id="skip_{{ zone }}" /><label for="id_{{ zone }}">{{ zone }}</label><br />
+  <input {% if zone == '.' %}checked="checked"{% endif%} type="checkbox" name="skip_{{ zone }}" id="skip_{{ zone }}" /><label for="id_{{ zone }}">{{ zone }}</label><br />
   {% endfor %}
   </p>
+  {% endif %}
+  {% for query in queries %}
+    {{ query.name }} ({{ query.qtype }}) is {% if query.available %}available <input type="submit" name="show_{{ query.qtype }}" value="Show" />{% else %}being traced <img src="{{ MEDIA_URL }}/spinner.gif" />{% endif %}<br />
+  {% endfor %}
   </form>
+{% endblock %}
+{% block extrahead %}
+{% if is_waiting %}
+<meta http-equiv="refresh" content="5">
+{% endif %}
 {% endblock %}
