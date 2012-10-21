@@ -36,19 +36,20 @@ def index(request):
                                                          qtype=form.cleaned_data['qtype'])
             if created:
                 obj.queue()
-            if obj.available and obj.queried_at < datetime.datetime.now() - datetime.timedelta(1):
+            if obj.available and obj.queried_at and obj.queried_at < datetime.datetime.now() - datetime.timedelta(1):
                 obj.available = 0
                 obj.queue()
                 obj.save()
             return HttpResponseRedirect('./%s/' % form.cleaned_data['name'])
     else:
         form = DnsNameForm()
-    bs = beanstalkc.Connection(**settings.BEANSTALK_SERVER)
-    
-    data = {
-        'form': form,
-        'jobs': bs.stats_tube('dns-graph')['current-jobs-ready']
-    }
+
+    data = {'form': form}
+    try:
+        bs = beanstalkc.Connection(**settings.BEANSTALK_SERVER)
+        data['jobs'] = bs.stats_tube('dns-graph')['current-jobs-ready']
+    except beanstalkc.CommandFailed:
+        pass
     return render_to_response("dnsgraph/index.html", context_instance=RequestContext(request, data))
 
 def by_name(request, name):
