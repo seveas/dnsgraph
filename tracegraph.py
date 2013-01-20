@@ -87,7 +87,12 @@ class Zone(object):
         if name in self.resolvers:
             # Misconfiguration a la otenet.gr, ns1.otenet.gr isn't glued anywhere. www.cosmote.gr A lookup triggered it
             pass
-        return [x for x in self.resolvers.values() if x.ip][0].resolve(name, rdtype=rdtype, register=False)
+        for resolver in self.resolvers.values():
+            if resolver.ip:
+                return resolver.resolve(name, rdtype=rdtype, register=False)
+        else:
+            # No glue at all
+            return self.resolvers.values()[0].resolve(name, rdtype=rdtype, register=False)
 
     def find_root_resolvers(self):
         for root in 'abcdefghijklm':
