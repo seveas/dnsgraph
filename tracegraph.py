@@ -320,6 +320,17 @@ class Resolver(object):
                         name.addresses[msg] = []
                     name.addresses[msg].append(self)
                 return
+            if zonename == self.zone.name:
+                # Weird... no answer for our own zone?
+                if register:
+                    msg = 'NXDOMAIN'
+                    if name not in self.root.names:
+                        self.root.names[name] = Name(name)
+                    name = self.root.names[name]
+                    if msg not in name.addresses:
+                        name.addresses[msg] = []
+                    name.addresses[msg].append(self)
+                return
             if record.rdtype == dns.rdatatype.NS:
                 if not register:
                     zone = Zone(zonename, self.root)
