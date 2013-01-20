@@ -131,7 +131,7 @@ class Zone(object):
                         continue
                     if ns in self.names[name].addresses[address]:
                         continue
-                    graph.append('    "%s" -> "%s" [label="%s",color="red",fontcolor="red"];' % (ns.name, address, name))
+                    graph.append('    "%s" -> "%s" [label="(%s)",color="red",fontcolor="red"];' % (ns.name, address, name))
 
         # And hop all zones back
         for zone in sorted(self.subzones.values() + [self], key=lambda x: x.name):

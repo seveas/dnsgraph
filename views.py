@@ -36,7 +36,7 @@ def index(request):
                                                          qtype=form.cleaned_data['qtype'])
             if created:
                 obj.queue()
-            if obj.available and obj.queried_at and obj.queried_at < datetime.datetime.now() - datetime.timedelta(1):
+            if obj.available and obj.queried_at and obj.queried_at < datetime.datetime.now() - datetime.timedelta(0,3600):
                 obj.available = 0
                 obj.queue()
                 obj.save()
