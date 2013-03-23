@@ -82,6 +82,9 @@ def by_name(request, name):
 
 def as_png(request, name):
     qtype = 'A'
+    format = request.GET.get('format', 'png')
+    if format not in tracegraph.__dot_formats and format != 'raw':
+        format = 'png'
     for qtype_ in recordtypes:
         if request.GET.get('show_%s' % qtype_, None):
             qtype = qtype_
@@ -93,4 +96,6 @@ def as_png(request, name):
         root = tracegraph.Zone.load('yaml', fd)
     skip = [x[5:] for x in request.GET if x.startswith('skip_')]
     graph = root.graph(skip=skip)
-    return HttpResponse(shell.dot('-T', 'png', input="\n".join(graph)).stdout, content_type='image/png')
+    if format == 'raw':
+        return HttpResponse("\n".join(graph), content_type='text/plain')
+    return HttpResponse(shell.dot('-T', format, input="\n".join(graph)).stdout, content_type='image/png')
