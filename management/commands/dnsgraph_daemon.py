@@ -2,8 +2,11 @@ from django.core.management import BaseCommand
 from dnsgraph.models import DnsName
 import beanstalkc
 from django.conf import settings
-import tracegraph
 import datetime
+import sys
+from os.path import dirname as d
+sys.path.insert(0,d(d(d(__file__))))
+import tracegraph
 
 class Command(BaseCommand):
     help = "Run all the DNS requests"
