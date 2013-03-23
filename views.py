@@ -36,7 +36,7 @@ def index(request):
                                                          qtype=form.cleaned_data['qtype'])
             if created:
                 obj.queue()
-            if obj.available and obj.queried_at and obj.queried_at < datetime.datetime.now() - datetime.timedelta(0,3600):
+            if obj.available and obj.queried_at and obj.queried_at < datetime.datetime.now() - datetime.timedelta(0,900):
                 obj.available = 0
                 obj.queue()
                 obj.save()
@@ -60,7 +60,12 @@ def by_name(request, name):
     has_results = False
     is_waiting = False
     for query in queries:
-        if query.available:
+        if query.available and query.queried_at and query.queried_at < datetime.datetime.now() - datetime.timedelta(0,900):
+            query.available = 0
+            query.queue()
+            query.save()
+            is_waiting = True
+        elif query.available:
             with open(query.data_path) as fd:
                 data = yaml.safe_load(fd)
                 zones = zones.union(set([x['name'] for x in data['zones']]))

@@ -12,8 +12,8 @@
   {% endif %}
   {% for query in queries %}
     {{ query.name }} ({{ query.qtype }}) is {% if query.available %}available <input type="submit" name="show_{{ query.qtype }}" value="Show" />{% else %}being traced <img src="{{ MEDIA_URL }}/spinner.gif" />{% endif %}<br />
-  <small>(Data is cached for up to one hour)</small>
   {% endfor %}
+  <small>(Data is cached for fifteen minutes)</small>
   </form>
 {% endblock %}
 {% block extrahead %}
