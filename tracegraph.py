@@ -23,7 +23,6 @@
 # OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 import dns.resolver
-import os
 import socket
 import sys
 from whelk import shell, pipe
@@ -457,7 +456,6 @@ def root():
 
 if __name__ == '__main__':
     import optparse
-    import subprocess
 
     usage = """%prog [options] name - Trace all resolution paths for a name and graph them
 

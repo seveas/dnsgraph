@@ -1,6 +1,5 @@
 from django.core.management import BaseCommand
 from dnsgraph.models import DnsName
-from django.db import connection
 import beanstalkc
 from django.conf import settings
 import tracegraph
