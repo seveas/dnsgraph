@@ -173,7 +173,7 @@ class Zone(object):
     def load(klass, format, fd):
         if format == 'yaml':
             import yaml
-            return klass.deserialize(yaml.load(fd))
+            return klass.deserialize(yaml.safe_load(fd))
         if format == 'json':
             import json
             return klass.deserialize(json.load(fd))

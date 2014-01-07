@@ -62,7 +62,7 @@ def by_name(request, name):
     for query in queries:
         if query.available:
             with open(query.data_path) as fd:
-                data = yaml.load(fd)
+                data = yaml.safe_load(fd)
                 zones = zones.union(set([x['name'] for x in data['zones']]))
             has_results = True
         else:
