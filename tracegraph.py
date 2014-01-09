@@ -509,7 +509,7 @@ Examples:
         p.error("At least one of --dump, --graph and --nagios is required")
         p.exit(1)
 
-    if opts.quiet:
+    if opts.quiet or opts.nagios:
         log = lambda x: None
 
     rdtype = dns.rdatatype.from_text(opts.rdtype)
