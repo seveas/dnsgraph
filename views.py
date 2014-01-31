@@ -13,6 +13,7 @@ import tracegraph
 from whelk import shell
 import datetime
 import beanstalkc
+import os
 
 class DnsNameForm(ModelForm):
     # Not quite true, but good enough
@@ -48,7 +49,8 @@ def index(request):
                                                          qtype=form.cleaned_data['qtype'])
             if created:
                 obj.queue()
-            if obj.available and obj.queried_at and obj.queried_at < datetime.datetime.now() - datetime.timedelta(0,900):
+            if obj.available and ((obj.queried_at and obj.queried_at < datetime.datetime.now() - datetime.timedelta(0,900))
+                                  or not os.path.exists(obj.data_path)):
                 obj.available = 0
                 obj.queue()
                 obj.save()
@@ -72,7 +74,8 @@ def by_name(request, name):
     has_results = False
     is_waiting = False
     for query in queries:
-        if query.available and query.queried_at and query.queried_at < datetime.datetime.now() - datetime.timedelta(0,900):
+        if query.available and ((query.queried_at and query.queried_at < datetime.datetime.now() - datetime.timedelta(0,900)) 
+                                or not os.path.exists(query.data_path)):
             query.available = 0
             query.queue()
             query.save()
@@ -103,6 +106,8 @@ def as_png(request, name):
     try:
         query = DnsName.objects.get(name=name, qtype=qtype)
     except DnsName.DoesNotExist:
+        raise Http404
+    if not os.path.exists(query.data_path):
         raise Http404
     with open(query.data_path) as fd:
         root = tracegraph.Zone.load('yaml', fd)
