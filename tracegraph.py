@@ -236,7 +236,7 @@ class Name(object):
     def serialize(self):
         return {
             'name': self.name,
-            'addresses': dict([(addr, [(res.zone.name, res.name) for res in self.addresses[addr]]) for addr in self.addresses])
+            'addresses': dict([(addr, [[res.zone.name, res.name] for res in self.addresses[addr]]) for addr in self.addresses])
         }
 
     @classmethod
@@ -440,7 +440,7 @@ class Resolver(object):
         return {
             'name': self.name,
             'ip': self.ip,
-            'up': [(res.zone.name, res.name) for res in self.up],
+            'up': [[res.zone.name, res.name] for res in self.up],
         }
 
     @classmethod
