@@ -418,7 +418,7 @@ class Resolver(object):
                         name.addresses[cname] = []
                     name.addresses[cname].append(self)
 
-            elif record.rdtype == dns.rdatatype.TXT:
+            elif record.rdtype in (dns.rdatatype.TXT, dns.rdatatype.SOA):
                 for x in record.items:
                     addr = x.to_text()
                     if addr not in name.addresses:
