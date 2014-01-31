@@ -3,7 +3,7 @@ from django.db import models
 import beanstalkc
 import os
 
-recordtypes = ("A", "AAAA", "MX", "SOA", "SRV", "TXT")
+recordtypes = ("A", "AAAA", "MX", "PTR", "SOA", "SRV", "TXT")
 
 class DnsName(models.Model):
     name = models.CharField("DNS Name", max_length=100)

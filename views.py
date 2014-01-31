@@ -1,5 +1,6 @@
 # Create your views here.
 
+import dns.reversename
 from django.shortcuts import render_to_response
 from django.forms import ModelForm, TextInput, ValidationError
 from django.http import HttpResponse, HttpResponseRedirect, Http404
@@ -14,7 +15,8 @@ import datetime
 import beanstalkc
 
 class DnsNameForm(ModelForm):
-    valid_hostname = re.compile(r'^[-_a-z0-9]+(?:\.[-_a-z0-9]+)+$')
+    # Not quite true, but good enough
+    valid_hostname = re.compile(r'^[-_a-z0-9]+(?:(:?\.|:+)[-_a-z0-9]+)+$')
 
     class Meta:
         model = DnsName
@@ -27,6 +29,16 @@ class DnsNameForm(ModelForm):
         if not self.valid_hostname.match(name):
             raise ValidationError("Invalid hostname")
         return name
+
+    def clean(self):
+        cleaned_data = super(DnsNameForm, self).clean()
+        if 'name' in cleaned_data:
+            if cleaned_data['qtype'] == 'PTR':
+                try:
+                    cleaned_data['name'] = dns.reversename.from_address(cleaned_data['name']).to_text()
+                except dns.exception.SyntaxError:
+                    pass
+        return cleaned_data
 
 def index(request):
     if request.POST:

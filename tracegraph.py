@@ -418,7 +418,7 @@ class Resolver(object):
                         name.addresses[cname] = []
                     name.addresses[cname].append(self)
 
-            elif record.rdtype in (dns.rdatatype.TXT, dns.rdatatype.SOA):
+            elif record.rdtype in (dns.rdatatype.TXT, dns.rdatatype.SOA, dns.rdatatype.PTR):
                 for x in record.items:
                     addr = x.to_text()
                     if addr not in name.addresses:
@@ -467,7 +467,7 @@ Examples:
     p = optparse.OptionParser(usage=usage)
     p.add_option('-q', '--quiet', dest='quiet', action="store_true", default=False,
                  help="No diagnostic messages")
-    p.add_option('-t', '--type', dest='rdtype', default='A', choices=('A', 'AAAA', 'MX'),
+    p.add_option('-t', '--type', dest='rdtype', default='A', choices=('A', 'AAAA', 'MX', 'TXT', 'SRV', 'SOA', 'PTR'),
                  help="Which record type to query")
     p.add_option('-d', '--dump', dest='dump', default=None, metavar='FILE',
                  help="Dump resolver data to a file")
@@ -518,6 +518,13 @@ Examples:
             root = Zone.load(opts.format, fd)
     else:
         name = args[0]
+        if rdtype == dns.rdatatype.PTR:
+            print "ISPTR"
+            # If an IP address is given, convert it to .in-addr.arpa
+            try:
+                name = dns.reversename.from_address(name).to_text()
+            except dns.exception.SyntaxError:
+                pass
         root = root()
         root.trace_missing_glue = opts.trace_missing_glue
         root.even_trace_m_gtld_servers_net = opts.even_trace_m_gtld_servers_net
