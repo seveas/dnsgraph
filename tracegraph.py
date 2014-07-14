@@ -262,6 +262,8 @@ class Resolver(object):
     def resolve(self, name, rdtype=dns.rdatatype.A, register=True):
         if not self.ip:
             log("Did not receive glue record for %s" % self.name)
+            if name == self.name:
+                return ["No glue"]
             if self.zone.trace_missing_glue and (self.name != 'm.gtld-servers.net.' or self.zone.even_trace_m_gtld_servers_net):
                 self.root.trace(self.name, dns.rdatatype.A)
                 if self.root.names[self.name].addresses:
