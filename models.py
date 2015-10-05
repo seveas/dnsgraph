@@ -1,7 +1,9 @@
+import datetime
 from django.conf import settings
 from django.db import models
-import beanstalkc
+from azuki import beanstalk
 import os
+import tracegraph
 
 recordtypes = ("A", "AAAA", "MX", "PTR", "SOA", "SRV", "TXT")
 
@@ -11,11 +13,16 @@ class DnsName(models.Model):
     available = models.BooleanField("Available", default=False, editable=False)
     queried_at = models.DateTimeField("Queried at", blank=True, null=True, editable=False)
 
-    def queue(self):
-        bs = beanstalkc.Connection(**settings.BEANSTALK_SERVER)
-        bs.use('dns-graph')
-        bs.put(str("%s %s" % (self.name,self.qtype)))
-
     @property
     def data_path(self):
         return os.path.join(settings.STATIC_ROOT, 'dnsgraph', "%s-%s.yaml" % (self.name.replace('.', '_'), self.qtype))
+
+    @beanstalk('dns-graph')
+    def trace(self):
+        root = tracegraph.root()
+        root.trace(self.name, self.qtype)
+        with open(self.data_path, 'w') as fd:
+            root.dump('yaml', fd)
+        self.available = True
+        self.queried_at = datetime.datetime.now()
+        self.save()

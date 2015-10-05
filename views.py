@@ -12,7 +12,6 @@ import yaml
 import tracegraph
 from whelk import shell
 import datetime
-import beanstalkc
 import os
 
 class DnsNameForm(ModelForm):
@@ -48,22 +47,18 @@ def index(request):
             obj, created = DnsName.objects.get_or_create(name=form.cleaned_data['name'],
                                                          qtype=form.cleaned_data['qtype'])
             if created:
-                obj.queue()
+                obj.trace()
             if obj.available and ((obj.queried_at and obj.queried_at < datetime.datetime.now() - datetime.timedelta(0,900))
                                   or not os.path.exists(obj.data_path)):
                 obj.available = 0
-                obj.queue()
+                obj.trace()
                 obj.save()
             return HttpResponseRedirect('./%s/' % form.cleaned_data['name'])
     else:
         form = DnsNameForm()
 
     data = {'form': form}
-    try:
-        bs = beanstalkc.Connection(**settings.BEANSTALK_SERVER)
-        data['jobs'] = bs.stats_tube('dns-graph')['current-jobs-ready']
-    except beanstalkc.CommandFailed:
-        pass
+    data['jobs'] = DnsName.trace.stats()['current-jobs-ready']
     return render_to_response("dnsgraph/index.html", context_instance=RequestContext(request, data))
 
 def by_name(request, name):
@@ -77,7 +72,7 @@ def by_name(request, name):
         if query.available and ((query.queried_at and query.queried_at < datetime.datetime.now() - datetime.timedelta(0,900)) 
                                 or not os.path.exists(query.data_path)):
             query.available = 0
-            query.queue()
+            query.trace()
             query.save()
             is_waiting = True
         elif query.available:

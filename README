@@ -40,6 +40,7 @@ Requirements
 
 For the django app only:
 - beanstalkd and beanstalkc (kr.github.com/beanstalkd)
+- azuki (seveas.github.com/azuki)
 - django (djangoproject.com)
 
 Django app
