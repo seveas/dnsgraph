@@ -1,5 +1,4 @@
-{% extends "ip_info/base.html" %}
-{% block github_repo %}dnsgraph{% endblock %}
+{% extends "dnsgraph/base.html" %}
 {% block content %}
   <form action="../{{ query.qtype}}.png" method="GET">
   {% if query.available %}
@@ -10,8 +9,14 @@
   {% endfor %}
   </p>
   {% endif %}
-  {{ query.name }} ({{ query.qtype }}) is {% if query.available %}available <input type="submit" value="Show" />{% else %}being traced <img src="{{ MEDIA_URL }}/spinner.gif" />{% endif %}<br />
+  {{ query.name }} ({{ query.qtype }}) is {% if query.available %}available <input type="submit" value="Show" />{% else %}being traced <img src="{{ MEDIA_URL }}/spinner.gif" />{% endif %}
+  <p>
+  {% if query.available %}
   <small>(Data is cached for fifteen minutes)</small>
+  {% else %}
+  <small>There are currently {{ jobs }} traces in the queue, please be patient.</small>
+  {% endif %}
+  </p>
   </form>
 {% endblock %}
 {% block extrahead %}

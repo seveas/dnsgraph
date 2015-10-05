@@ -1,5 +1,4 @@
-{% extends "ip_info/base.html" %}
-{% block github_repo %}dnsgraph{% endblock %}
+{% extends "dnsgraph/base.html" %}
 {% block content %}
   {% if error %}<h2 class="error">{{ error }}</h2>{% endif %}
   <form action="." method="POST">
@@ -13,7 +12,7 @@
   </form>
   {% if jobs %}
   <p>
-  There are currently {{ jobs }} traces in the queue, please be patient.
+  <small>There are currently {{ jobs }} traces in the queue, please be patient.</small>
   </p>
   {% endif %}
 {% endblock %}

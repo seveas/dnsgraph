@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>{% block title %}IP address info{% endblock %}</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <link href='http://fonts.googleapis.com/css?family=Ubuntu' rel='stylesheet' type='text/css'>
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
+  <script type="text/javascript">
+    function resize() {
+        if($("#main").height() < $(window).height()) {
+            $("#main").css({'top': ($(window).height() - $("#main").height())/2});
+        }
+        else {
+            console.log("not smaller");
+            $("#main").css({'top': 0});
+        }
+        if($("#main").width() < $(window).width()) {
+            $("#main").css({'left': ($(window).width() - $("#main").width())/2});
+        }
+        else {
+            $("#main").css({'left': 0});
+        }
+    }
+    $(window).ready(function() { resize(); });
+    $(window).resize(function() { resize(); });
+  </script>
+  <style type="text/css">
+  body,input,select,a,a:hover,a:active {
+    font-family: 'Ubuntu', sans-serif;
+    font-size: 28px;
+    color: #6d6d6d;
+  }
+  .opts {
+    text-align: left;
+  }
+  #main {
+    margin: 0px;
+    position: absolute;
+    text-align: center;
+  }
+  td,th {
+    text-align: left;
+    vertical-align: top;
+  }
+  .forkme {
+    position: fixed;
+    top: 0;
+    right: 0;
+    border: 0;
+    z-index: 9;
+  }
+  pre, pre a, pre a:hover, pre a:active {
+    font-size: 12px;
+    text-align: left;
+  }
+  </style>
+  {% block extrahead %}{% endblock %}
+</head>
+<body>
+{% block forkme %}
+<a href="https://github.com/{% block github_user %}seveas{% endblock%}/{% block github_repo %}dnsgraph{% endblock %}"><img class="forkme" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" /></a>
+{% endblock %}
+<div id="main">
+{% block content %}
+{% endblock %}
+</div>
+</body>
+</html>

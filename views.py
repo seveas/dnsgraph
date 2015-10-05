@@ -51,9 +51,10 @@ def index(request):
     else:
         form = DnsNameForm()
 
-    data = {'form': form}
-    data['jobs'] = DnsName.trace.stats()['current-jobs-ready']
-    return render_to_response("dnsgraph/index.html", context_instance=RequestContext(request, data))
+    return render_to_response("dnsgraph/index.html", context_instance=RequestContext(request, {
+        'form': form,
+        'jobs': DnsName.trace.stats()['current-jobs-ready'],
+    }))
 
 def by_name(request, name, qtype):
     query = get_object_or_404(DnsName, name=name, qtype=qtype)
@@ -68,6 +69,7 @@ def by_name(request, name, qtype):
     return render_to_response('dnsgraph/by_name.html', context_instance=RequestContext(request, {
         'query': query,
         'zones': sorted(list(zones)),
+        'jobs': DnsName.trace.stats()['current-jobs-ready'],
     }))
 
 def as_png(request, name, qtype):
