@@ -235,7 +235,7 @@ class Name(object):
 
     def serialize(self):
         return {
-            'name': self.name,
+            'name': str(self.name),
             'addresses': dict([(addr, [[res.zone.name, res.name] for res in self.addresses[addr]]) for addr in self.addresses])
         }
 
@@ -521,7 +521,6 @@ Examples:
     else:
         name = args[0]
         if rdtype == dns.rdatatype.PTR:
-            print "ISPTR"
             # If an IP address is given, convert it to .in-addr.arpa
             try:
                 name = dns.reversename.from_address(name).to_text()

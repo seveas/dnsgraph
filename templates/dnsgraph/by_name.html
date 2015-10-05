@@ -1,23 +1,21 @@
 {% extends "ip_info/base.html" %}
 {% block github_repo %}dnsgraph{% endblock %}
 {% block content %}
-  <form action="../png/{{ queries.0.name }}/" method="GET">
-  {% if has_results %}
+  <form action="../{{ query.qtype}}.png" method="GET">
+  {% if query.available %}
   <p class="opts">
-  In the graphs, skip nameservers for <br />
+  In the graph, skip nameservers for <br />
   {% for zone in zones %}
   <input {% if zone == '.' %}checked="checked"{% endif%} type="checkbox" name="skip_{{ zone }}" id="skip_{{ zone }}" /><label for="id_{{ zone }}">{{ zone }}</label><br />
   {% endfor %}
   </p>
   {% endif %}
-  {% for query in queries %}
-    {{ query.name }} ({{ query.qtype }}) is {% if query.available %}available <input type="submit" name="show_{{ query.qtype }}" value="Show" />{% else %}being traced <img src="{{ MEDIA_URL }}/spinner.gif" />{% endif %}<br />
-  {% endfor %}
+  {{ query.name }} ({{ query.qtype }}) is {% if query.available %}available <input type="submit" value="Show" />{% else %}being traced <img src="{{ MEDIA_URL }}/spinner.gif" />{% endif %}<br />
   <small>(Data is cached for fifteen minutes)</small>
   </form>
 {% endblock %}
 {% block extrahead %}
-{% if is_waiting %}
+{% if not query.available %}
 <meta http-equiv="refresh" content="5">
 {% endif %}
 {% endblock %}

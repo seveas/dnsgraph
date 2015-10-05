@@ -17,8 +17,20 @@ class DnsName(models.Model):
     def data_path(self):
         return os.path.join(settings.STATIC_ROOT, 'dnsgraph', "%s-%s.yaml" % (self.name.replace('.', '_'), self.qtype))
 
+    def maybe_trace(self):
+        # Only once per 15 minutes...
+        if self.available and self.queried_at and self.queried_at > datetime.datetime.now() - datetime.timedelta(0,900):
+            if os.path.exists(self.data_path):
+                return
+        self.available = False
+        self.save()
+        self.trace()
+
     @beanstalk('dns-graph')
     def trace(self):
+        if self.available and self.queried_at and self.queried_at > datetime.datetime.now() - datetime.timedelta(0,900):
+            if os.path.exists(self.data_path):
+                return
         root = tracegraph.root()
         root.trace(self.name, self.qtype)
         with open(self.data_path, 'w') as fd:
