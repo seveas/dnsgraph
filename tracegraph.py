@@ -364,7 +364,7 @@ class Resolver(object):
         # Process glue records
         for record in ans.response.additional:
             if record.rdtype in rdtypes_for_nameservers:
-                zone.resolvers[record.name.to_text()].ip = [x.address for x in record.items]
+                zone.resolvers[record.name.to_text().lower()].ip = [x.address for x in record.items]
 
         # Simple resolution?
         if not register:
