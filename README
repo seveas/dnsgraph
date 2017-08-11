@@ -34,14 +34,14 @@ Options:
 
 Requirements
 ------------
-- dnspython (dnspython.org)
-- whelk (seveas.github.com/whelk)
+- dnspython (dnspython.org, https://pypi.python.org/pypi/dnspython)
+- whelk (seveas.github.io/whelk/, https://pypi.python.org/pypi/whelk)
 - graphviz (graphviz.org)
 
 For the django app only:
-- beanstalkd and beanstalkc (kr.github.com/beanstalkd)
+- beanstalkd and beanstalkc (kr.github.io/beanstalkd/)
 - azuki (seveas.github.com/azuki)
-- django (djangoproject.com)
+- django (djangoproject.com, https://pypi.python.org/pypi/Django)
 
 Django app
 ----------
