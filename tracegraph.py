@@ -27,6 +27,11 @@ import socket
 import sys
 from whelk import shell, pipe
 
+try:
+    basestring = basestring
+except NameError:
+    basestring = (str, bytes)
+
 __dot_formats = (
     'bmp', 'canon', 'dot', 'xdot', 'cmap', 'eps', 'fig', 'gd', 'gd2', 'gif',
     'gtk', 'ico', 'imap', 'cmapx', 'imap_np', 'cmapx_np', 'ismap', 'jpg',
