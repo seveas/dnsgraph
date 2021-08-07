@@ -32,6 +32,12 @@ try:
 except NameError:
     basestring = (str, bytes)
 
+try:
+    dns.resolver.resolve = dns.resolver.resolve
+except AttributeError:
+    dns.resolver.resolve = dns.resolver.query
+    dns.resolver.Resolver.resolve = dns.resolver.Resolver.query
+
 __dot_formats = (
     'bmp', 'canon', 'dot', 'xdot', 'cmap', 'eps', 'fig', 'gd', 'gd2', 'gif',
     'gtk', 'ico', 'imap', 'cmapx', 'imap_np', 'cmapx_np', 'ismap', 'jpg',
@@ -102,7 +108,7 @@ class Zone(object):
         for root in 'abcdefghijklm':
             root += '.root-servers.net.'
             self.resolvers[root] = Resolver(self, root)
-            self.resolvers[root].ip = [x.address for x in dns.resolver.query(root,rdtype=dns.rdatatype.A).response.answer[0]]
+            self.resolvers[root].ip = [x.address for x in dns.resolver.resolve(root,rdtype=dns.rdatatype.A).response.answer[0]]
             self.resolvers[root].up = []
 
     def graph(self, skip=[], errors_only=False):
@@ -291,7 +297,7 @@ class Resolver(object):
             res.nameservers = self.ip[:1]
             log("Trying to resolve %s (%s) on %s (%s) (R:%s)" % (name, dns.rdatatype.to_text(rdtype), self.name, self.ip[0], register))
             try:
-                ans = res.query(name, rdtype=rdtype, raise_on_no_answer=False)
+                ans = res.resolve(name, rdtype=rdtype, raise_on_no_answer=False)
             except (dns.resolver.NXDOMAIN, dns.resolver.NoNameservers, dns.resolver.Timeout):
                 # Insert a bogus name node for NXDOMAIN/SERVFAIL
                 msg = dns_errors[sys.exc_info()[0]]
