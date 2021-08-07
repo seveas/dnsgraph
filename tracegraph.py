@@ -96,7 +96,7 @@ class Zone(object):
                 return resolver.resolve(name, rdtype=rdtype, register=False)
         else:
             # No glue at all
-            return self.resolvers.values()[0].resolve(name, rdtype=rdtype, register=False)
+            return list(self.resolvers.values())[0].resolve(name, rdtype=rdtype, register=False)
 
     def find_root_resolvers(self):
         for root in 'abcdefghijklm':
@@ -143,7 +143,7 @@ class Zone(object):
                     graph.append('    "%s" -> "%s" [label="(%s)",color="red",fontcolor="red"];' % (ns.name, address_, name))
 
         # And hop all zones back
-        for zone in sorted(self.subzones.values() + [self], key=lambda x: x.name):
+        for zone in sorted(list(self.subzones.values()) + [self], key=lambda x: x.name):
             if zone.name in skip:
                 continue
             all_upns = set()
@@ -275,6 +275,8 @@ class Resolver(object):
                     self.ip = self.root.names[self.name].addresses.keys()
             else:
                 self.ip = self.root.resolve(self.name, dns.rdatatype.A)
+            if self.ip:
+                self.ip = list(self.ip)
         if not self.ip or self.ip == ['NODATA']:
             if register:
                 msg = 'NODATA'
