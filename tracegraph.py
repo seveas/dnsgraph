@@ -542,13 +542,14 @@ Examples:
 
     if opts.graph:
         graph = root.graph(skip=skip, errors_only=opts.errors_only)
+        graph = "\n".encode('UTF-8').join([line.encode('UTF-8') for line in graph])
         args = ["-T", opts.graph]
         if opts.output:
             args += ["-o", opts.output]
         if opts.display:
-            pipe(pipe.dot(*args, input="\n".join(graph)) | pipe.display("-"))
+            pipe(pipe.dot(*args, input=graph) | pipe.display("-"))
         else:
-            shell.dot(*args, input="\n".join(graph), stdout=sys.stdout)
+            shell.dot(*args, input=graph, stdout=sys.stdout)
 
     if opts.nagios:
         graph = root.graph(errors_only=True)
