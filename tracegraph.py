@@ -541,9 +541,17 @@ Examples:
         if opts.output:
             args += ["-o", opts.output]
         if opts.display:
-            pipe(pipe.dot(*args, input="\n".join(graph)) | pipe.display("-"))
+            try:
+                pipe(pipe.dot(*args, input="\n".join(graph)) | pipe.display("-"))
+            except AttributeError:
+                print("dot/display not found, install graphviz/imagemagick")
+                sys.exit(1)
         else:
-            shell.dot(*args, input="\n".join(graph), stdout=sys.stdout)
+            try:
+                shell.dot(*args, input="\n".join(graph), stdout=sys.stdout)
+            except AttributeError:
+                print("dot not found, install graphviz")
+                sys.exit(1)
 
     if opts.nagios:
         graph = root.graph(errors_only=True)
