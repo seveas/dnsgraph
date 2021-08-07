@@ -289,7 +289,7 @@ class Resolver(object):
                 ans = res.query(name, rdtype=rdtype, raise_on_no_answer=False)
             except (dns.resolver.NXDOMAIN, dns.resolver.NoNameservers, dns.resolver.Timeout):
                 # Insert a bogus name node for NXDOMAIN/SERVFAIL
-                msg = dns_errors[sys.exc_type]
+                msg = dns_errors[sys.exc_info()[0]]
                 if not register:
                     return
                 if name not in self.root.names:
