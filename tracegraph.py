@@ -143,7 +143,7 @@ class Zone(object):
                     graph.append('    "%s" -> "%s" [label="(%s)",color="red",fontcolor="red"];' % (ns.name, address_, name))
 
         # And hop all zones back
-        for zone in sorted(self.subzones.values() + [self], key=lambda x: x.name):
+        for zone in sorted(list(self.subzones.values()) + [self], key=lambda x: x.name):
             if zone.name in skip:
                 continue
             all_upns = set()
@@ -272,9 +272,9 @@ class Resolver(object):
             if self.zone.trace_missing_glue and (self.name != 'm.gtld-servers.net.' or self.zone.even_trace_m_gtld_servers_net):
                 self.root.trace(self.name, dns.rdatatype.A)
                 if self.root.names[self.name].addresses:
-                    self.ip = self.root.names[self.name].addresses.keys()
+                    self.ip = list(self.root.names[self.name].addresses.keys())
             else:
-                self.ip = self.root.resolve(self.name, dns.rdatatype.A)
+                self.ip = list(self.root.resolve(self.name, dns.rdatatype.A))
         if not self.ip or self.ip == ['NODATA']:
             if register:
                 msg = 'NODATA'
