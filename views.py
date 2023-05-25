@@ -84,6 +84,7 @@ def as_png(request, name, qtype):
         root = tracegraph.Zone.load('yaml', fd)
     skip = [x[5:] for x in request.GET if x.startswith('skip_')]
     graph = root.graph(skip=skip)
+    graph = "\n".encode('UTF-8').join([line.encode('UTF-8') for line in graph])
     if format == 'raw':
-        return HttpResponse("\n".join(graph), content_type='text/plain')
-    return HttpResponse(shell.dot('-T', format, input="\n".join(graph)).stdout, content_type='image/png')
+        return HttpResponse(graph, content_type='text/plain')
+    return HttpResponse(shell.dot('-T', format, input=graph).stdout, content_type='image/png')

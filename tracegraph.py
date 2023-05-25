@@ -27,6 +27,17 @@ import socket
 import sys
 from whelk import shell, pipe
 
+try:
+    basestring = basestring
+except NameError:
+    basestring = (str, bytes)
+
+try:
+    dns.resolver.resolve = dns.resolver.resolve
+except AttributeError:
+    dns.resolver.resolve = dns.resolver.query
+    dns.resolver.Resolver.resolve = dns.resolver.Resolver.query
+
 __dot_formats = (
     'bmp', 'canon', 'dot', 'xdot', 'cmap', 'eps', 'fig', 'gd', 'gd2', 'gif',
     'gtk', 'ico', 'imap', 'cmapx', 'imap_np', 'cmapx_np', 'ismap', 'jpg',
@@ -91,13 +102,13 @@ class Zone(object):
                 return resolver.resolve(name, rdtype=rdtype, register=False)
         else:
             # No glue at all
-            return self.resolvers.values()[0].resolve(name, rdtype=rdtype, register=False)
+            return list(self.resolvers.values())[0].resolve(name, rdtype=rdtype, register=False)
 
     def find_root_resolvers(self):
         for root in 'abcdefghijklm':
             root += '.root-servers.net.'
             self.resolvers[root] = Resolver(self, root)
-            self.resolvers[root].ip = [x.address for x in dns.resolver.query(root,rdtype=dns.rdatatype.A).response.answer[0]]
+            self.resolvers[root].ip = [x.address for x in dns.resolver.resolve(root,rdtype=dns.rdatatype.A).response.answer[0]]
             self.resolvers[root].up = []
 
     def graph(self, skip=[], errors_only=False):
@@ -138,7 +149,7 @@ class Zone(object):
                     graph.append('    "%s" -> "%s" [label="(%s)",color="red",fontcolor="red"];' % (ns.name, address_, name))
 
         # And hop all zones back
-        for zone in sorted(self.subzones.values() + [self], key=lambda x: x.name):
+        for zone in sorted(list(self.subzones.values()) + [self], key=lambda x: x.name):
             if zone.name in skip:
                 continue
             all_upns = set()
@@ -270,6 +281,8 @@ class Resolver(object):
                     self.ip = self.root.names[self.name].addresses.keys()
             else:
                 self.ip = self.root.resolve(self.name, dns.rdatatype.A)
+            if self.ip:
+                self.ip = list(self.ip)
         if not self.ip or self.ip == ['NODATA']:
             if register:
                 msg = 'NODATA'
@@ -286,10 +299,10 @@ class Resolver(object):
             res.nameservers = self.ip[:1]
             log("Trying to resolve %s (%s) on %s (%s) (R:%s)" % (name, dns.rdatatype.to_text(rdtype), self.name, self.ip[0], register))
             try:
-                ans = res.query(name, rdtype=rdtype, raise_on_no_answer=False)
+                ans = res.resolve(name, rdtype=rdtype, raise_on_no_answer=False)
             except (dns.resolver.NXDOMAIN, dns.resolver.NoNameservers, dns.resolver.Timeout):
                 # Insert a bogus name node for NXDOMAIN/SERVFAIL
-                msg = dns_errors[sys.exc_type]
+                msg = dns_errors[sys.exc_info()[0]]
                 if not register:
                     return
                 if name not in self.root.names:
@@ -537,13 +550,14 @@ Examples:
 
     if opts.graph:
         graph = root.graph(skip=skip, errors_only=opts.errors_only)
+        graph = "\n".encode('UTF-8').join([line.encode('UTF-8') for line in graph])
         args = ["-T", opts.graph]
         if opts.output:
             args += ["-o", opts.output]
         if opts.display:
-            pipe(pipe.dot(*args, input="\n".join(graph)) | pipe.display("-"))
+            pipe(pipe.dot(*args, input=graph) | pipe.display("-"))
         else:
-            shell.dot(*args, input="\n".join(graph), stdout=sys.stdout)
+            shell.dot(*args, input=graph, stdout=sys.stdout)
 
     if opts.nagios:
         graph = root.graph(errors_only=True)
